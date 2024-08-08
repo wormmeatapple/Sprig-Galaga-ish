@@ -3,6 +3,7 @@ const background = "o";
 const alien = "a";
 const bullet = "b";
 let loop = "loop"
+let difficulty = 900
 
 setLegend(
   [player, bitmap`
@@ -82,16 +83,16 @@ setSolids([])
 let level = 0
 const levels = [
   map`
-.a.a.a.a.
-a.a.a.a.a
-.........
-.........
-.........
-.........
-.........
-.........
-.........
-....p....`
+....a.a....
+.....a.....
+...........
+...........
+...........
+...........
+...........
+...........
+...........
+.....p.....`
 ]
 
 setMap(levels[level])
@@ -101,34 +102,26 @@ onInput("s", () => getFirst(player).y += 1);
 onInput("a", () => getFirst(player).x -= 1);
 onInput("d", () => getFirst(player).x += 1);
 
-onInput("i", () => moveAlien();
+setInterval(moveAlien, difficulty)
 
+function randomNum() {
+  const number = Math.floor(Math.random() * 3) + 1;
+  return number
+}
 
 function moveAlien() {
-  let ticker = 0
-  const alienPos = getAll(alien)
-  
-  if (ticker == 0) {
-    alien.x += 1
-    ticker += 1
-  }
-  if (ticker == 1) {
-    alien.x += 1
-    ticker += 1
-  }
-  if (ticker == 2) {
-    alien.y += 1
-    ticker += 1
-  }
-  if (ticker == 3) {
-    alien.x -= 1
-    ticker += 1
-  }
-  if (ticker == 4) {
-    alien.x -= 1
-    ticker += 1
-  }
+  getAll(alien).forEach(alien => {
+    const move = randomNum();
+    if (move == 1) {
+      alien.x += 1;
+    } else if (move == 2) {
+      alien.x -= 1;
+    } else {
+      alien.y += 1;
+    }
+  });
 }
+
 
 
 setPushables({
