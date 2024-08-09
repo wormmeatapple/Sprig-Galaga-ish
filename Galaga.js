@@ -1,3 +1,14 @@
+/*
+Written by wormmeatapple
+Inspired by arcade game Galaga
+Ai was used for syntax, erorrs in code, and clarification, but no ai written code was used
+Shoutout to the game Exodus and Half-fry for having some code that inspired my own
+Thank you to Hack Club for creating Sprig!
+
+W A S D to move
+I to shoot
+*/
+
 //variable storage
 const player = "p";
 const background = "o";
@@ -45,7 +56,7 @@ setLegend(
 0000000000000000
 0000000000000000
 0000000000000000`],
-  [ alien, bitmap`
+  [alien, bitmap`
 ................
 .........2......
 ..7...77772..72.
@@ -62,7 +73,7 @@ setLegend(
 ......77772.....
 ................
 ................`],
-  [ bullet, bitmap`
+  [bullet, bitmap`
 ................
 ................
 ................
@@ -104,21 +115,20 @@ const levels = [
 setMap(levels[level])
 
 //player input
-if (canMove) {
-  onInput("w", () => getFirst(player).y -= 1);
-  onInput("s", () => getFirst(player).y += 1);
-  onInput("a", () => getFirst(player).x -= 1);
-  onInput("d", () => getFirst(player).x += 1);
-  onInput("i", () => shootBullet());
-}
+// shortened this cause otherwise it looks way too big for just one line of stuff
+onInput("w", () => {if (canMove) {getFirst(player).y -= 1;}});
+onInput("s", () => {if (canMove) {getFirst(player).y += 1;}});
+onInput("a", () => {if (canMove) {getFirst(player).x -= 1;}});
+onInput("d", () => {if (canMove) {getFirst(player).x += 1;}});
+onInput("i", () => {if (canMove) {shootBullet()}});
+
 
 //constant loop storage
 
 setInterval(bulletMove, 150)
-setInterval(bulletHit, 1)
-if (canMove) {
-  setInterval(moveAlien, difficulty)
-}
+setInterval(bulletHit, 30)
+setInterval(playerHit, 30)
+
 
 //function storage
 function randomNum() {
@@ -172,13 +182,13 @@ function bulletHit() {
 }
 
 function playerHit() {
-  getAll(alien).forEach(alien => {
-    getFirst(player)
-    if (player.y == alien.y && player.x == alien.x) {
-      player.remove()
-      alien.remove()
+  let playerPos = getFirst(player)
+  getAll(alien).forEach(alienPos => {
+    if (playerPos.y == alienPos.y && playerPos.x == alienPos.x) {
+      playerPos.remove()
       canMove = false
-      addSprite(6, 11, player)
+      addSprite(5, 10, player)
+      
       spawnEnemies()
       setTimeout(() => {
         canMove = true
@@ -186,14 +196,26 @@ function playerHit() {
     }
   });
 }
-                        
-        
+
+function spawnEnemies() {
+  
+}
+
+
+
+addText("Lives", { 
+  x: 8,
+  y: 0,
+  color: color`3`
+})
+
+
 
 
 setPushables({
-  [ player ]: []
+  [player]: []
 })
 
 afterInput(() => {
-  
+
 })
