@@ -190,14 +190,13 @@ if (canMove) {
 
 
 //function storage
-function randomNum() {
-  const number = Math.floor(Math.random() * 3) + 1;
-  return number
+function randomNum(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function moveAlien() {
   getAll(alien).forEach(alien => {
-    const move = randomNum();
+    const move = randomNum(1, 3);
     if (move == 1) {
       alien.x += 1;
     } else if (move == 2) {
@@ -245,24 +244,16 @@ function playerHit() {
   let playerPos = getFirst(player)
   getAll(alien).forEach(alienPos => {
     if (playerPos.y == alienPos.y && playerPos.x == alienPos.x) {
-      playerPos.remove()
-      flashBack()
-      canMove = false
-      addSprite(5, 10, player)
+      resetPlayer()
       clearTile(maxLife, 0)
       addSprite(maxLife, 0, x)
       maxLife -= 1
       spawnEnemies()
-      setTimeout(() => {
-        canMove = true
-      }, 1500);
     }
   });
 }
 
-function spawnEnemies() {
 
-}
 
 function displayLives() {
   maxLife = 10
@@ -308,6 +299,29 @@ function flashBack() {
   }, 300);
 }
 
+function resetPlayer() {
+  let playerPos = getFirst(player)
+  playerPos.remove
+  flashBack()
+  canMove = false
+  addSprite(5, 10, player)
+  setTimeout(() => {
+        canMove = true
+      }, 1500);
+}
+  
+function resetLevel() {
+  if (getAll(alien) == 0) {
+    resetPlayer()
+    spawnEnemies()
+    difficulty -= 20
+  }
+}
+
+function spawnEnemies() {
+  let difficultyBig = 1000 - difficulty
+  for (let i = 0; i < randomNum(3, Math.floor(difficultyBig / 25))
+}
 
 
 setPushables({
