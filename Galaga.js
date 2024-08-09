@@ -1,9 +1,14 @@
+//variable storage
 const player = "p";
 const background = "o";
 const alien = "a";
 const bullet = "b";
 let loop = "loop"
 let difficulty = 900
+let score = 0
+let canShoot = true
+let lives = 3
+let canMove = true
 
 setLegend(
   [player, bitmap`
@@ -83,8 +88,9 @@ setSolids([])
 let level = 0
 const levels = [
   map`
-....a.a....
-.....a.....
+...........
+.a.a.a.a.a.
+..a.a.a.a..
 ...........
 ...........
 ...........
@@ -97,13 +103,24 @@ const levels = [
 
 setMap(levels[level])
 
-onInput("w", () => getFirst(player).y -= 1);
-onInput("s", () => getFirst(player).y += 1);
-onInput("a", () => getFirst(player).x -= 1);
-onInput("d", () => getFirst(player).x += 1);
+//player input
+if (canMove) {
+  onInput("w", () => getFirst(player).y -= 1);
+  onInput("s", () => getFirst(player).y += 1);
+  onInput("a", () => getFirst(player).x -= 1);
+  onInput("d", () => getFirst(player).x += 1);
+  onInput("i", () => shootBullet());
+}
 
-setInterval(moveAlien, difficulty)
+//constant loop storage
 
+setInterval(bulletMove, 150)
+setInterval(bulletHit, 1)
+if (canMove) {
+  setInterval(moveAlien, difficulty)
+}
+
+//function storage
 function randomNum() {
   const number = Math.floor(Math.random() * 3) + 1;
   return number
@@ -122,6 +139,55 @@ function moveAlien() {
   });
 }
 
+function shootBullet() {
+  if (canShoot) {
+    let playerPos = getFirst(player)
+    addSprite(playerPos.x, playerPos.y - 1, bullet)
+    canShoot = false
+    setTimeout(() => {
+      canShoot = true
+    }, 450);
+  }
+}
+
+function bulletMove() {
+  getAll(bullet).forEach(bullet => {
+    bullet.y -= 1
+    if (bullet.y == 0) {
+      bullet.remove()
+    }
+  });
+}
+
+function bulletHit() {
+  getAll(bullet).forEach(bullet => {
+    getAll(alien).forEach(alien => {
+      if (alien.x == bullet.x && alien.y == bullet.y) {
+        alien.remove()
+        bullet.remove()
+        score += 100
+      }
+    });
+  });
+}
+
+function playerHit() {
+  getAll(alien).forEach(alien => {
+    getFirst(player)
+    if (player.y == alien.y && player.x == alien.x) {
+      player.remove()
+      alien.remove()
+      canMove = false
+      addSprite(6, 11, player)
+      spawnEnemies()
+      setTimeout(() => {
+        canMove = true
+      }, 1500);
+    }
+  });
+}
+                        
+        
 
 
 setPushables({
