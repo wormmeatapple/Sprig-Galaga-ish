@@ -9,7 +9,7 @@ W A S D to move
 I to shoot
 */
 
-//variable storage
+//sprite storage
 const player = "p"
 const background = "o"
 const alien = "a"
@@ -17,7 +17,8 @@ const bullet = "b"
 const x = "x"
 const playerfake = "f"
 const blue = "l"
-let loop = "loop"
+
+//variable storage
 let difficulty = 900
 let score = 0
 let canShoot = true
@@ -25,6 +26,19 @@ let lives = 3
 let canMove = true
 let maxLife = 10
 
+//sound storage
+const step = tune `
+66.66666666666667: C4^66.66666666666667 + D4-66.66666666666667 + C5-66.66666666666667 + B4^66.66666666666667,
+66.66666666666667: D4^66.66666666666667 + E4-66.66666666666667 + D5-66.66666666666667 + C5^66.66666666666667,
+66.66666666666667: E4^66.66666666666667 + F4-66.66666666666667 + E5-66.66666666666667 + D5^66.66666666666667,
+1933.3333333333335`
+const death = tune`
+119.5219123505976: G4/119.5219123505976,
+119.5219123505976,
+119.5219123505976: B4/119.5219123505976,
+119.5219123505976,
+119.5219123505976: C4/119.5219123505976 + D4-119.5219123505976 + E4-119.5219123505976,
+3227.091633466135`
 setLegend(
   [player, bitmap`
 ................
@@ -154,8 +168,8 @@ let level = 0
 const levels = [
   map`
 ...........
-.a.a.a.a.a.
-..a.a.a.a..
+.....a.....
+...........
 ...........
 ...........
 ...........
@@ -181,12 +195,11 @@ onInput("i", () => { if (canMove) { shootBullet() } });
 
 //constant loop storage
 
-setInterval(bulletMove, 150)
+setInterval(bulletMove, 120)
 setInterval(bulletHit, 30)
 setInterval(playerHit, 30)
-if (canMove) {
-  setInterval(moveAlien, difficulty)
-}
+setInterval(moveAlien, difficulty)
+
 
 
 //function storage
@@ -195,6 +208,7 @@ function randomNum(min, max) {
 }
 
 function moveAlien() {
+  playTune(step)
   getAll(alien).forEach(alien => {
     const move = randomNum(1, 3);
     if (move == 1) {
@@ -214,7 +228,7 @@ function shootBullet() {
     canShoot = false
     setTimeout(() => {
       canShoot = true
-    }, 450);
+    }, 420); //blaze it
   }
 }
 
@@ -235,6 +249,7 @@ function bulletHit() {
         bullet.remove()
         score += 100
         displayScore()
+        resetLevel()
       }
     });
   });
@@ -249,6 +264,7 @@ function playerHit() {
       addSprite(maxLife, 0, x)
       maxLife -= 1
       spawnEnemies()
+      playTune(death)
     }
   });
 }
@@ -300,10 +316,10 @@ function flashBack() {
 }
 
 function resetPlayer() {
-  let playerPos = getFirst(player)
-  playerPos.remove
-  flashBack()
   canMove = false
+  let playerPos = getFirst(player)
+  playerPos.remove()
+  flashBack()
   addSprite(5, 10, player)
   setTimeout(() => {
         canMove = true
@@ -311,16 +327,29 @@ function resetPlayer() {
 }
   
 function resetLevel() {
-  if (getAll(alien) == 0) {
+  if (getAll(alien).length == 0) {
     resetPlayer()
     spawnEnemies()
-    difficulty -= 20
+    difficulty -= 40
   }
 }
 
 function spawnEnemies() {
   let difficultyBig = 1000 - difficulty
-  for (let i = 0; i < randomNum(3, Math.floor(difficultyBig / 25))
+  for (let i = 0; i < Math.floor(difficultyBig / 25); i++) {
+    addSprite(randomNum(1, 9), randomNum(1, 2), alien)
+  }
+} 
+
+function resetEnemies() {
+  let alienCount = 0
+  getAll(alien).forEach(alien => {
+    alienCount ++
+    alien.remove()
+  });
+  for (let i = 0; i < alienCount; i ++) {
+    addSprite(randomNum(1, 9), randomNum(1, 2), alien)
+  }
 }
 
 
