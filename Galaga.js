@@ -19,14 +19,16 @@ const playerfake = "f"
 const blue = "l"
 
 //variable storage
-  let gamePlaying = false
-  let difficulty = 900
-  let score = 0
-  let canShoot = true
-  let lives = 3
-  let canMove = true
-  let maxLife = 10
-  let mainMenu = false
+let difficulty = 900
+let score = 0
+let canShoot = true
+let lives = 3
+let canMove = true
+let maxLife = 10
+let mainMenuOn = false
+let moveAlienInterval
+let gameOverOn = false
+  
 
 //sound storage
 const step = tune `
@@ -169,17 +171,17 @@ setSolids([])
 let level = 0
 const levels = [
   map`
-..a........
-.....a.aa..
-..a.aa...a.
-..aaa.aa...
-.a.a...a.a.
-..a..f..aa.
-aa.a...a...
-..a.a.a.a..
-..aa.a.a...
-....a..a...
-...........`,
+a.aa.a.aaa.
+aa......aaa
+.a.......aa
+a..........
+a.........a
+.a...p....a
+a.........a
+a.........a
+a.......aa.
+.aa.a.aa.aa
+a.aa.aaaa.a`,
   map`
 ...........
 .....a.....
@@ -194,7 +196,11 @@ aa.a...a...
 ...........`,
 ]
 
-setMap(levels[level])
+
+
+//game contents i guess
+mainMenu()
+
 
 //player input
 // shortened this cause otherwise it looks way too big for just one line of stuff
@@ -220,14 +226,15 @@ setInterval(playerHit, 30)
 //function storage
 function startGame() {
   clearText()
-  level = 1
-  let gamePlaying = true
-  let difficulty = 900
-  let score = 0
-  let canShoot = true
-  let lives = 3
-  let canMove = true
-  let maxLife = 10
+  setMap(levels[1])
+  difficulty = 900
+  score = 0
+  canShoot = true
+  lives = 3
+  canMove = true
+  maxLife = 10
+  mainMenuOn = true
+  gameOverOn = false
   displayLives()
   displayScore()
   moveAlienInterval = setInterval(moveAlien, difficulty);
@@ -240,19 +247,32 @@ function pauseGame() {
   clearTile(9, 0)
   clearTile(10, 0)
   canMove = false
+  playback.end()
 }
 
 function mainMenu() {
-  mainMenu = true
-  level = 0
+  mainMenuOn = true
+  setMap(levels[0])
+  clearText()
   pauseGame()
   addText("Galaga-ish", {x:5, y:3, color: color`3`})
   addText("K to start", {x:5, y:6, color: color`3`})
-  while (mainMenu) {
-    onInput("k" () => {startGame()})
-  }
+  onInput("k", () => {if (mainMenuOn) {startGame()}})
 }
-      
+
+function gameOver() {
+  pauseGame()
+  gameOverOn = true
+  getAll(alien).forEach(alien => {
+    alien.remove();
+  });
+  getFirst(player).remove()
+  addText("Game over!", {x:5, y: 3, color: color`3`})
+  addText(`Score: ${score}`, {x: 5, y: 4, color: color`3`})
+  addText("L to go", {x:6, y: 8, color: color`3`})
+  addText("to main menu", {x:4, y: 9, color: color`3`})
+  onInput("l", () => {if (gameOverOn) {mainMenu()}})
+}
     
   
   
@@ -312,12 +332,15 @@ function playerHit() {
   let playerPos = getFirst(player)
   getAll(alien).forEach(alienPos => {
     if (playerPos.y == alienPos.y && playerPos.x == alienPos.x) {
+      if (maxLife == 8) {
+        gameOver()
+      }
       resetPlayer()
       clearTile(maxLife, 0)
       addSprite(maxLife, 0, x)
       maxLife -= 1
       resetEnemies()
-      playTune(death)
+        playTune(death)
     }
   });
 }
