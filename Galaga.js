@@ -28,6 +28,7 @@ let maxLife = 10
 let mainMenuOn = false
 let moveAlienInterval
 let gameOverOn = false
+
   
 
 //sound storage
@@ -233,7 +234,7 @@ function startGame() {
   lives = 3
   canMove = true
   maxLife = 10
-  mainMenuOn = true
+  mainMenuOn = false
   gameOverOn = false
   displayLives()
   displayScore()
@@ -241,19 +242,17 @@ function startGame() {
 }
 
 function pauseGame() {
-  clearInterval(moveAlienInterval);
+  clearInterval(moveAlienInterval)
   clearText()
   clearTile(8, 0)
   clearTile(9, 0)
   clearTile(10, 0)
   canMove = false
-  playback.end()
 }
 
 function mainMenu() {
   mainMenuOn = true
   setMap(levels[0])
-  clearText()
   pauseGame()
   addText("Galaga-ish", {x:5, y:3, color: color`3`})
   addText("K to start", {x:5, y:6, color: color`3`})
@@ -393,8 +392,7 @@ function flashBack() {
 
 function resetPlayer() {
   canMove = false
-  let playerPos = getFirst(player)
-  playerPos.remove()
+  getFirst(player).remove()
   flashBack()
   addSprite(5, 10, player)
   setTimeout(() => {
