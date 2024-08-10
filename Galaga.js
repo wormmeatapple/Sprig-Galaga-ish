@@ -19,12 +19,14 @@ const playerfake = "f"
 const blue = "l"
 
 //variable storage
-let difficulty = 900
-let score = 0
-let canShoot = true
-let lives = 3
-let canMove = true
-let maxLife = 10
+  let gamePlaying = false
+  let difficulty = 900
+  let score = 0
+  let canShoot = true
+  let lives = 3
+  let canMove = true
+  let maxLife = 10
+  let mainMenu = false
 
 //sound storage
 const step = tune `
@@ -167,6 +169,18 @@ setSolids([])
 let level = 0
 const levels = [
   map`
+..a........
+.....a.aa..
+..a.aa...a.
+..aaa.aa...
+.a.a...a.a.
+..a..f..aa.
+aa.a...a...
+..a.a.a.a..
+..aa.a.a...
+....a..a...
+...........`,
+  map`
 ...........
 .....a.....
 ...........
@@ -176,12 +190,11 @@ const levels = [
 ...........
 ...........
 ...........
-...........
-.....p.....`
+.....p.....
+...........`,
 ]
 
 setMap(levels[level])
-displayLives()
 
 //player input
 // shortened this cause otherwise it looks way too big for just one line of stuff
@@ -193,16 +206,56 @@ onInput("i", () => { if (canMove) { shootBullet() } });
 
 
 
+
 //constant loop storage
 
 setInterval(bulletMove, 120)
 setInterval(bulletHit, 30)
 setInterval(playerHit, 30)
-setInterval(moveAlien, difficulty)
+//alien move interval in startGame()
+
 
 
 
 //function storage
+function startGame() {
+  clearText()
+  level = 1
+  let gamePlaying = true
+  let difficulty = 900
+  let score = 0
+  let canShoot = true
+  let lives = 3
+  let canMove = true
+  let maxLife = 10
+  displayLives()
+  displayScore()
+  moveAlienInterval = setInterval(moveAlien, difficulty);
+}
+
+function pauseGame() {
+  clearInterval(moveAlienInterval);
+  clearText()
+  clearTile(8, 0)
+  clearTile(9, 0)
+  clearTile(10, 0)
+  canMove = false
+}
+
+function mainMenu() {
+  mainMenu = true
+  level = 0
+  pauseGame()
+  addText("Galaga-ish", {x:5, y:3, color: color`3`})
+  addText("K to start", {x:5, y:6, color: color`3`})
+  while (mainMenu) {
+    onInput("k" () => {startGame()})
+  }
+}
+      
+    
+  
+  
 function randomNum(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -263,7 +316,7 @@ function playerHit() {
       clearTile(maxLife, 0)
       addSprite(maxLife, 0, x)
       maxLife -= 1
-      spawnEnemies()
+      resetEnemies()
       playTune(death)
     }
   });
@@ -344,19 +397,11 @@ function spawnEnemies() {
 function resetEnemies() {
   let alienCount = 0
   getAll(alien).forEach(alien => {
-    alienCount ++
-    alien.remove()
+    alienCount++
+    alien.remove();
   });
-  for (let i = 0; i < alienCount; i ++) {
+  for (let i = 0; i < alienCount; i++) {
     addSprite(randomNum(1, 9), randomNum(1, 2), alien)
   }
 }
-
-
-setPushables({
-  [player]: []
-})
-
-afterInput(() => {
-
-})
+                   
